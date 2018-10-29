@@ -15,6 +15,7 @@ import org.janusgraph.core.schema.JanusGraphManagement;
 
 import com.opsramp.janus.core.GraphFactory;
 import com.opsramp.janus.core.SourceType;
+import com.opsramp.janus.core.VerticesMigrationThread;
 import com.opsramp.janus.util.ThreadPool;
 
 /**
@@ -52,7 +53,17 @@ public class JanusTest {
 			long clientId = sc.nextLong();*/
 			
 			System.out.println("DONE ---------------------");
-			processVertices(graph, 14);
+			
+			long[] clientIdList = {14};
+			//calling thread pool
+			ThreadPool pool=ThreadPool.getInstance();
+			for(long clientId:clientIdList)
+			{	System.out.println("Started migration for client with clientid:"+clientId);
+				pool.submit(new VerticesMigrationThread(graph, clientId));
+				System.out.println("Ended migration for client with clientid:"+clientId);
+			}
+			System.out.println("Completed migration for all clients with clientids:"+clientIdList);
+			
 			//printClientVertices(graph, 813);
 			
 		} catch (Throwable e) {
