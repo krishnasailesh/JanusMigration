@@ -2,120 +2,119 @@ package com.opsramp.janus.core;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphTransaction;
 import org.janusgraph.core.SchemaViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VerticesMigrationThread implements Runnable {
+	private static Logger log = LoggerFactory.getLogger(VerticesMigrationThread.class);
 	
 	private JanusGraph graph;
 	private long clientId;
-	public VerticesMigrationThread(JanusGraph graph,long clientId)
-	{	
+	private CountDownLatch latch;
+	
+	public VerticesMigrationThread(JanusGraph graph,long clientId, CountDownLatch latch) {
 		this.graph=graph;
 		this.clientId=clientId;
-		
+		this.latch= latch;
 	}
-	public static void processVertices(JanusGraph graph, long clientId) throws Exception{
+	
+	public  void processVertices(JanusGraph graph, long clientId) throws Exception {
 		JanusGraphTransaction tx = graph.newTransaction();
 		try {
-			SourceType[] sourceTypes = SourceType.values();
-			GraphTraversalSource g = tx.traversal();		
 			if(clientId > 0 ) {
-				/*for(SourceType st : sourceTypes) {
-					g.V().has("tenantId", clientId).has("sourceType", st.name()).property("sourceType","RESOURCE").iterate();
-				}*/
-				System.out.println("process vertex started");
-				
-				long startTime = new Date().getTime();				
-				
-				/*List<Vertex> list = g.V().has("tenantId", clientId).range(0,300).toList();
-				for(Vertex v : list) {
-					g.V(v.id()).has("sourceType", "RESOURCE").property("sourceType", "LOAD_BALANCER").iterate();
-				}
-				tx.commit();
-				graph.close();*/
-				//long count = getCountOfVerticesInClient(clientId);
 				long countTime =  new Date().getTime();
-				
-				int low = 1;
-				int high = 100;
+				int count = 0;
+				int low = LoadProperties.getIntProperty("range.lowvalue", 1);
+				int high = LoadProperties.getIntProperty("range.highvalue", 1000);
+				int rangeValue = LoadProperties.getIntProperty("range.rangevalue", 1000);
+				JanusGraphTransaction rangetx = null;
+				GraphTraversalSource gs = null;
 				while(true) {
-					System.out.println("range loop iteration started");
-					JanusGraph rangegraph = null;
-					JanusGraphTransaction rangetx = null;
-					GraphTraversalSource gs = null;
+					System.out.println("Range loop iteration lowValue : "+low+" , highValue : "+high+", clientId : "+clientId);
+					rangetx = graph.newTransaction();
 					try {
-						System.out.println("Creating transaction in loop");
-						rangegraph = GraphFactory.getInstance().getGraph();
-						rangetx = rangegraph.newTransaction();
-						System.out.println("New transaction created in loop");
 						gs = rangetx.traversal();
 						List<Vertex> list = gs.V().has("tenantId", clientId).has("sourceType").range(low, high).toList();
-						if(list.isEmpty())
+						if(list.isEmpty()) {
+							rangetx.close();
 							break;
+						}
+						
 						for(Vertex v : list) {
-							if(!(v.value("sourceType").toString().equalsIgnoreCase("Client") || 
-									v.value("sourceType").toString().equalsIgnoreCase("CloudService"))) {
+							String sourceTypeValue = v.value("sourceType").toString();
+							if(!(sourceTypeValue.equalsIgnoreCase("CLIENT") || 
+									sourceTypeValue.equalsIgnoreCase("CLOUD_SERVICE") ||
+									sourceTypeValue.equalsIgnoreCase("APP") ||
+									sourceTypeValue.equalsIgnoreCase("SERVICE"))) {
 								try {
-									gs.V(v.id()).has("sourceType", v.value("sourceType").toString()).property("sourceType", "RESOURCE").iterate();
-								}
-								catch (SchemaViolationException exc) {
+									System.out.println("Entered to iteration");
+//									gs.V(v.id()).has("sourceType", v.value("sourceType").toString()).property("sourceType", "RESOURCE").iterate();
+									v.property("entityType", "RESOURCE");
+									v.property("resourceType", sourceTypeValue);
+									count++;
+								} catch (SchemaViolationException exc) {
 									System.out.println("caught SchemaViolationException--- " + exc.getMessage());
+									log.error("SchemaViolationException for clientId : "+clientId);
+								}
+							} else {
+								try {
+									gs.V(v.id()).property("entityType", sourceTypeValue);
+									gs.V(v.id()).property("resourceType", sourceTypeValue);
+									count++;
+								} catch (SchemaViolationException exc) {
+									System.out.println("caught SchemaViolationException--- " + exc.getMessage());
+									log.error("SchemaViolationException for clientId : "+clientId);
 								}
 							}
 						}
-						System.out.println("Committing tx..");
+						log.error("Committing tx..");
 						rangetx.commit();
-						rangegraph.close();
-						System.out.println("updation done with range:::"+ low + "----"+ high);
 						low = high + 1;
-						high += 100;
-						
-					}
-					catch(Exception e) {
-						System.out.println("Transaction aborted::: in range loop");
+						high += rangeValue;
+					} catch(Exception e) {
+						log.error(" Migration Transaction aborted::: in range loop : lowValue : "+low+" high value: "+high+" ClientId: "+clientId);
+						System.out.println("Migration Transaction aborted::: of clientId: "+clientId);
 						rangetx.rollback();
-					}
-					finally {
+					} finally {
 						if(rangetx != null)
 							rangetx.close();
-						if(rangegraph != null)
-							rangegraph.close();
 					}
-					
+
 				}
-				//System.out.println("Device Count:::::::::::::"+ count);
-				System.out.println("batch size::--------"+ 100);
-				System.out.println("fetched count in::--------"+ (countTime - startTime));
-				System.out.println("process vertices in::--------"+ (new Date().getTime()-countTime)) ;
+				log.error("Batch size::--------"+ rangeValue);
+				System.out.println("batch size::--------"+ rangeValue);
+				log.error("Total time to process ::{} :  vertices in ::----- {} :sec, of ClientId : {} ",count, (new Date().getTime()-countTime)/1000, clientId);
+				System.out.println("Total time to process ::"+count+ ":  vertices in ::----- "+ (new Date().getTime()-countTime)/1000+" : sec,  of clientId :"+clientId) ;
 				
 			}	
-			
-			System.out.println("update done successfully.");
-			
-			
-		}
-		catch (Throwable e) {
+			log.error("update done successfully of CLIENTID : {}",clientId);
+		} catch (Throwable e) {
 			if (tx != null) {
 				tx.rollback();
 			}
 			throw new Exception(e.getMessage(), e);
 		} finally {
+			if(latch != null) {
+				latch.countDown();
+			}
 			if (tx != null) {
 				tx.close();
 			}
+			
 		}
 	}
-	public void run()
-	{
+	
+	public void run() {
 		try {
 			processVertices(graph, clientId);
 		} catch (Exception e) {
-		
 			e.printStackTrace();
 		}
 	}

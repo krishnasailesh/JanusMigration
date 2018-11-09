@@ -50,18 +50,65 @@
 			<groupId>org.janusgraph</groupId>
 			<artifactId>janusgraph-core</artifactId>
 			<version>${janusgraph.version}</version>
+	<exclusions>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.janusgraph</groupId>
 			<artifactId>janusgraph-cassandra</artifactId>
 			<version>${janusgraph.version}</version>
+			<exclusions>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.janusgraph</groupId>
 			<artifactId>janusgraph-es</artifactId>
 			<version>${janusgraph.version}</version>
+			<exclusions>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
+			<exclusions>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+        </exclusion>
+      </exclusions>
+		</dependency>
+		
 	</dependencies>
+	
 	<properties>
 		<janusgraph.version>0.2.0</janusgraph.version>
 	</properties>

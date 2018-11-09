@@ -9,8 +9,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.janusgraph.core.JanusGraph;
 import org.janusgraph.core.JanusGraphFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.opsramp.janus.util.StringUtil;
 
@@ -21,7 +19,7 @@ public class GraphFactory {
 
 	private static GraphFactory _instance = null;
 
-	private static final Logger logger = LoggerFactory.getLogger(GraphFactory.class);
+//	private static final Logger logger = LoggerFactory.getLogger(GraphFactory.class);
 
 	private JanusGraph graph;
 
@@ -64,7 +62,7 @@ public class GraphFactory {
 						}
 
 						graph = JanusGraphFactory.open(conf);
-						logger.info("Janus graph loaded successfully.");
+//						logger.info("Janus graph loaded successfully.");
 					} catch (Exception e) {
 						throw new IllegalStateException(e);
 					}

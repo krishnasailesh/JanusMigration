@@ -1,0 +1,28 @@
+2018-11-09 21:40:59 ERROR JanusTest:30 - Migrated ClientIds List : [4] 
+2018-11-09 21:40:59 ERROR JanusTest:38 - Started migration for client with clientid: 4 
+2018-11-09 21:40:59 ERROR JanusTest:40 - Ended migration for client with clientid: 4 
+2018-11-09 21:41:05 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:08 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:12 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:15 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:19 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:25 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:31 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:38 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:45 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:41:55 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:42:06 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:42:16 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:42:28 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:42:39 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:42:52 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:43:06 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:43:21 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:43:36 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:43:53 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:44:12 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:44:28 ERROR VerticesMigrationThread:77 - Committing tx..
+2018-11-09 21:44:45 ERROR VerticesMigrationThread:91 - Batch size::--------1000
+2018-11-09 21:44:45 ERROR VerticesMigrationThread:93 - Total time to process ::20001 :  vertices in ::----- 226 :sec, of ClientId : 4 
+2018-11-09 21:44:45 ERROR VerticesMigrationThread:97 - update done successfully of CLIENTID : 4
+2018-11-09 21:44:45 ERROR JanusTest:43 - Completed migration for all clients with clientids:[4]

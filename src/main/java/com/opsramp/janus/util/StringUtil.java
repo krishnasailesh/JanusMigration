@@ -2,6 +2,8 @@ package com.opsramp.janus.util;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -23,5 +25,19 @@ public final class StringUtil {
 		String jarPath = location.getFile();
 		File file = new File(jarPath);
 		return file.getParent();
+	}
+	
+	public static List<Long> convertStringToLongList(String strs,String delimit) {
+		List<Long> values = new ArrayList<>();
+		if(strs != null) {
+			for(String str : strs.split(delimit)) {
+				try {
+					values.add(Long.parseLong(str.trim()));
+				} catch(Throwable e) {
+					//ignore
+				}
+			}
+		}
+		return values;
 	}
 }
